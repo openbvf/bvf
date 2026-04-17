@@ -2,6 +2,9 @@
 name = "bvf"
 version.workspace = true
 edition = "2024"
+description = "Library for personal encryption"
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
 base64 = "0.22.1"

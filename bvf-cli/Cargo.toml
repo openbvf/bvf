@@ -2,6 +2,9 @@
 name = "bvf-cli"
 version.workspace = true
 edition = "2024"
+description = "Command-line tool for encrypting and decrypting files using the bvf format"
+license.workspace = true
+repository.workspace = true
 
 [[bin]]
 name = "bvf"

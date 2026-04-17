@@ -1,6 +1,6 @@
 # bvf CLI
 
-Command-line tool for encrypting and decrypting files using the bvf format (HPKE + XChaCha20-Poly1305 + Argon2id key protection).
+Command-line tool for encrypting and decrypting files using the bvf format.
 
 ## Installation
 

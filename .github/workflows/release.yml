@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "bvf-cli-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64
+            runner: ubuntu-latest
+          - target: aarch64
+            runner: ubuntu-latest-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: cargo build --release -p bvf-cli
+
+      - run: tar czf bvf-linux-${{ matrix.target }}.tar.gz -C target/release bvf
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#bvf-cli-}" >> "$GITHUB_OUTPUT"
+
+      - uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          name: ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: bvf-linux-${{ matrix.target }}.tar.gz

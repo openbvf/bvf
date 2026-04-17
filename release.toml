@@ -1,4 +1,4 @@
-push = false
+push = true
 publish = false
 tag-message = "{{version}}"
 pre-release-commit-message = "release {{version}}"

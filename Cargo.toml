@@ -3,7 +3,7 @@ members = ["bvf", "bvf-cli"]
 resolver = "3"
 
 [workspace.package]
-version = "0.1.9"
+version = "0.1.10"
 
 [workspace.lints.clippy]
 unused_io_amount = "deny"

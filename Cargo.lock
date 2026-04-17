@@ -140,7 +140,7 @@ checksum = "5d20789868f4b01b2f2caec9f5c4e0213b41e3e5702a50157d699ae31ced2fcb"
 
 [[package]]
 name = "bvf"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "base64",
  "hpke",
@@ -155,7 +155,7 @@ dependencies = [
 
 [[package]]
 name = "bvf-cli"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "bvf",
  "clap",

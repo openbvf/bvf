@@ -4,6 +4,14 @@ Command-line tool for encrypting and decrypting files using the bvf format (HPKE
 
 ## Installation
 
+### Homebrew (macOS Apple Silicon)
+
+```
+brew install openbvf/tap/bvf
+```
+
+### From source
+
 ```
 cargo install --path .
 ```

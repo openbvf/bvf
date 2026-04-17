@@ -6,4 +6,4 @@ Threat focus is mostly on passive filesystem access via cloud sync, OS indexing,
 
 - **[bvf](bvf/)** — Rust library
 - **[spec](SPEC.md)** — Crypto spec and file format
-- **[bvf-cli](bvf-cli/)** — command-line tool
+- **[bvf-cli](bvf-cli/)** — command-line tool (`brew install openbvf/tap/bvf`)

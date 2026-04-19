@@ -386,7 +386,10 @@ fn cmd_keygen(output: &PathBuf, verbose: bool) {
     if verbose {
         eprintln!("Generating X25519 keypair...");
     }
-    let keypair = Keypair::generate();
+    let keypair = Keypair::generate().unwrap_or_else(|e| {
+        eprintln!("Error: {e}");
+        process::exit(1);
+    });
 
     let passphrase = Locked::new(passphrase).unwrap_or_else(|e| {
         eprintln!("Error: {e}");

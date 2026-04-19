@@ -22,7 +22,7 @@
 //!
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! // Generate a keypair and export the private key protected by a passphrase
-//! let keypair = bvf::Keypair::generate();
+//! let keypair = bvf::Keypair::generate()?;
 //! let passphrase = bvf::Locked::new("my passphrase".to_string())?;
 //! let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
 //!
@@ -47,7 +47,7 @@
 //! ```
 //! use bvf::config::HEADER_SIZE;
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let keypair = bvf::Keypair::generate();
+//! let keypair = bvf::Keypair::generate()?;
 //! let passphrase = bvf::Locked::new("my passphrase".to_string())?;
 //! let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
 //!

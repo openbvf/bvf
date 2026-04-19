@@ -9,7 +9,7 @@ use std::io::Cursor;
 use std::io::{Seek, SeekFrom};
 
 fn e2e(plaintext: &mut [u8]) {
-    let kp = Keypair::generate();
+    let kp = Keypair::generate().expect("generate bomb");
     let passphrase = Locked::new("hi".to_string()).unwrap();
     let key = kp
         .export_encrypted_private_key(passphrase)
@@ -51,7 +51,7 @@ fn roundtrip_empty() {
 
 #[test]
 fn wrong_passphrase() {
-    let kp = Keypair::generate();
+    let kp = Keypair::generate().expect("generate bomb");
     let passphrase = Locked::new("hi".to_string()).unwrap();
     let key = kp
         .export_encrypted_private_key(passphrase)
@@ -64,7 +64,7 @@ fn wrong_passphrase() {
 #[test]
 fn truncated_ciphertext() -> Result<(), Box<dyn std::error::Error>> {
     let plaintext = vec![0u8; CHUNK_SIZE];
-    let keypair = Keypair::generate();
+    let keypair = Keypair::generate().expect("generate bomb");
     let passphrase = Locked::new("hi".to_string())?;
     let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
 
@@ -86,7 +86,7 @@ fn truncated_ciphertext() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn trailing_bytes() -> Result<(), Box<dyn std::error::Error>> {
     let plaintext = vec![0u8; CHUNK_SIZE];
-    let keypair = Keypair::generate();
+    let keypair = Keypair::generate().expect("generate bomb");
     let passphrase = Locked::new("hi".to_string())?;
     let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
 
@@ -108,7 +108,7 @@ fn trailing_bytes() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn ciphertext_corruption() -> Result<(), Box<dyn std::error::Error>> {
     let plaintext = vec![0u8; CHUNK_SIZE];
-    let keypair = Keypair::generate();
+    let keypair = Keypair::generate().expect("generate bomb");
     let passphrase = Locked::new("hi".to_string())?;
     let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
 
@@ -131,7 +131,7 @@ fn ciphertext_corruption() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn rng_ephemeral_uniqueness() -> Result<(), Box<dyn std::error::Error>> {
     let plaintext = vec![0u8; 5];
-    let kp = Keypair::generate();
+    let kp = Keypair::generate().expect("generate bomb");
     let encrypter = Encrypter::new(&kp.public_key).expect("encrypter bomb");
     let mut source = Cursor::new(plaintext);
     let mut target = Cursor::new(vec![]);
@@ -152,7 +152,7 @@ fn rng_ephemeral_uniqueness() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn invalid_version_header() -> Result<(), Box<dyn std::error::Error>> {
-    let keypair = Keypair::generate();
+    let keypair = Keypair::generate().expect("generate bomb");
     let passphrase = Locked::new("hi".to_string())?;
     let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
 

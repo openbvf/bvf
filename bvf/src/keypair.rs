@@ -21,16 +21,16 @@ impl Keypair {
     /// Generates a new X25519 keypair.
     ///
     /// # Panics
-    /// Panics if libsodium fails to initialize or if `mlock` is unavailable.
-    #[must_use]
-    pub fn generate() -> Keypair {
+    /// Panics if libsodium fails to initialize.
+    /// # Errors
+    /// Returns [`BvfError::MemoryLockFailed`] if `mlock` fails.
+    pub fn generate() -> Result<Keypair, BvfError> {
         ensure_init().expect("Failed to initialize libsodium");
         let kp = crypto_box::KeyPair::generate();
-        Keypair {
+        Ok(Keypair {
             public_key: public_key_format::encode(kp.public_key.as_bytes()),
-            private_key: Locked::new(kp.secret_key.as_bytes().to_vec())
-                .expect("mlock failed: system memory locking unavailable"),
-        }
+            private_key: Locked::new(kp.secret_key.as_bytes().to_vec())?,
+        })
     }
 
     /// Encrypts the private key for storage using Argon2id + XSalsa20-Poly1305.

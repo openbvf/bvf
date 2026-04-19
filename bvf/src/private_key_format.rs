@@ -1,6 +1,5 @@
 use crate::errors::BvfError;
 use base64::prelude::*;
-use libsodium_rs::crypto_box;
 use libsodium_rs::crypto_pwhash;
 use libsodium_rs::crypto_secretbox;
 use serde::Deserialize;
@@ -30,7 +29,7 @@ pub(crate) fn validate(data: &[u8]) -> Result<PrivateKey, BvfError> {
     let ciphertext = BASE64_STANDARD
         .decode(encoded_private_key.ct)
         .map_err(|_| BvfError::InvalidPrivateKeyFormat)?;
-    let ct_len = crypto_box::SECRETKEYBYTES + crypto_secretbox::MACBYTES;
+    let ct_len = crypto_secretbox::KEYBYTES + crypto_secretbox::MACBYTES;
     if salt.len() != crypto_pwhash::SALTBYTES
         || nonce.len() != crypto_secretbox::NONCEBYTES
         || ciphertext.len() != ct_len
@@ -66,7 +65,7 @@ mod tests {
         let salt = BASE64_STANDARD.encode(&[0u8; crypto_pwhash::SALTBYTES]);
         let nonce = BASE64_STANDARD.encode(&[0u8; crypto_secretbox::NONCEBYTES]);
         let ct = BASE64_STANDARD
-            .encode(&[0u8; crypto_box::SECRETKEYBYTES + crypto_secretbox::MACBYTES]);
+            .encode(&[0u8; crypto_secretbox::KEYBYTES + crypto_secretbox::MACBYTES]);
         (salt, nonce, ct)
     }
 
@@ -90,7 +89,7 @@ mod tests {
     fn bad_ct_length() -> Result<(), Box<dyn std::error::Error>> {
         let (salt, nonce, _) = good_parts();
         let bad_ct = BASE64_STANDARD
-            .encode(&[0u8; crypto_box::SECRETKEYBYTES + crypto_secretbox::MACBYTES - 1]);
+            .encode(&[0u8; crypto_secretbox::KEYBYTES + crypto_secretbox::MACBYTES - 1]);
         validate_bad(&salt, &nonce, &bad_ct)?;
         Ok(())
     }

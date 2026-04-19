@@ -2,7 +2,6 @@ use crate::errors::BvfError;
 use crate::locked::Locked;
 use crate::private_key_format;
 use crate::public_key_format;
-use libsodium_rs::crypto_box;
 use libsodium_rs::crypto_pwhash;
 use libsodium_rs::crypto_scalarmult::curve25519;
 use libsodium_rs::crypto_secretbox;
@@ -35,7 +34,7 @@ impl KeyManager {
 
         let symmetric_key = Locked::new(
             crypto_pwhash::pwhash(
-                crypto_box::SECRETKEYBYTES,
+                crypto_secretbox::KEYBYTES,
                 passphrase.as_bytes(),
                 &private_key.salt,
                 crypto_pwhash::OPSLIMIT_SENSITIVE,

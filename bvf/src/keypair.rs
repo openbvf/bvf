@@ -48,7 +48,7 @@ impl Keypair {
 
         let key = Locked::new(
             crypto_pwhash::pwhash(
-                crypto_box::SECRETKEYBYTES,
+                crypto_secretbox::KEYBYTES,
                 passphrase.as_bytes(),
                 &salt,
                 crypto_pwhash::OPSLIMIT_SENSITIVE,

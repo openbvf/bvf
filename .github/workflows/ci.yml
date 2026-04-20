@@ -23,5 +23,3 @@ jobs:
       - run: cargo clippy --release --workspace
 
       - run: cargo test --release
-
-      - run: cargo test --doc --release

@@ -14,8 +14,8 @@ on drop.
 [`Read`](std::io::Read)/[`Write`](std::io::Write), chunking handled automatically.
 
 **Low-level** — push-based, one chunk at a time:
-- [`Encrypter::start`] + [`EncryptionState::encrypt_chunk`]
-- [`Decrypter::start`] + [`DecryptionState::decrypt_chunk`]
+- [`Encrypter::start`] + [`encrypter::EncryptionState::encrypt_chunk`]
+- [`Decrypter::start`] + [`decrypter::DecryptionState::decrypt_chunk`]
 
 # Examples
 ## High-level
@@ -23,7 +23,7 @@ on drop.
 use std::io::{Cursor, Seek, SeekFrom};
 
 // Generate a keypair and export the private key protected by a passphrase
-let keypair = bvf::Keypair::generate();
+let keypair = bvf::Keypair::generate()?;
 let passphrase = bvf::Locked::new("my passphrase".to_string())?;
 let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
 
@@ -44,26 +44,29 @@ assert_eq!(recovered.into_inner(), b"hello world");
 ```
 ## Low-level
 ```rust
-use bvf::config::HEADER_SIZE;
-let keypair = bvf::Keypair::generate();
+use bvf::config::{CHUNK_SIZE, CIPHERTEXT_CHUNK_SIZE, HEADER_SIZE};
+let keypair = bvf::Keypair::generate()?;
 let passphrase = bvf::Locked::new("my passphrase".to_string())?;
 let encrypted_key = keypair.export_encrypted_private_key(passphrase)?;
+let big_secret = [1u8; CHUNK_SIZE];
 
 // Encrypt
 let encrypter = bvf::Encrypter::new(&keypair.public_key)?;
 let (header, mut state) = encrypter.start()?;
 let mut ciphertext = header;
-ciphertext.extend(state.encrypt_chunk(b"hello world", true)?);
+ciphertext.extend(state.encrypt_chunk(&big_secret, false)?);
+ciphertext.extend(state.encrypt_chunk(&big_secret, true)?);
 
 // Decrypt
 let passphrase = bvf::Locked::new("my passphrase".to_string())?;
 let decrypter = bvf::Decrypter::new(&encrypted_key, passphrase)?;
 let header: [u8; HEADER_SIZE] = ciphertext[..HEADER_SIZE].try_into()?;
 let mut state = decrypter.start(&header)?;
-let plaintext = state.decrypt_chunk(&ciphertext[HEADER_SIZE..])?;
+let body = &ciphertext[HEADER_SIZE..];
+let mut plaintext = state.decrypt_chunk(&body[..CIPHERTEXT_CHUNK_SIZE])?;
+plaintext.extend(state.decrypt_chunk(&body[CIPHERTEXT_CHUNK_SIZE..])?);
 state.validate_complete()?;
-
-assert_eq!(plaintext, b"hello world");
+assert_eq!(plaintext, [1u8; CHUNK_SIZE * 2]);  // big_secret * 2
 ```
 
 <!-- cargo-rdme end -->

@@ -1,5 +1,5 @@
 use crate::config::{
-    CHUNK_SIZE, HEADER_SIZE, HPKE_EXPORT_CONTEXT, HPKE_INFO, VERSION_HEADER,
+    CIPHERTEXT_CHUNK_SIZE, HEADER_SIZE, HPKE_EXPORT_CONTEXT, HPKE_INFO, VERSION_HEADER,
 };
 use crate::errors::BvfError;
 use crate::io::read_exact_or_less;
@@ -161,7 +161,7 @@ impl Decrypter {
         src.read_exact(&mut header)
             .map_err(|_| BvfError::InvalidFormat)?;
         let mut state = self.start(&header)?;
-        let mut chunk = vec![0u8; CHUNK_SIZE + ABYTES];
+        let mut chunk = vec![0u8; CIPHERTEXT_CHUNK_SIZE];
         loop {
             let chunklen = read_exact_or_less(src, &mut chunk)
                 .map_err(|_| BvfError::DecryptionFailed)?;
@@ -204,7 +204,7 @@ mod tests {
             state: ss_state,
             finalized: true,
         };
-        let chunk = [0u8; CHUNK_SIZE + ABYTES];
+        let chunk = [0u8; CIPHERTEXT_CHUNK_SIZE];
         let result = state.decrypt_chunk(&chunk);
         assert!(matches!(result, Err(BvfError::DecryptionFailed)));
         Ok(())

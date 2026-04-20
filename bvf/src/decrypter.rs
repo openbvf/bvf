@@ -1,6 +1,5 @@
 use crate::config::{
-    CHUNK_SIZE, CIPHERTEXT_CHUNK_SIZE, HEADER_SIZE, HPKE_EXPORT_CONTEXT, HPKE_INFO,
-    VERSION_HEADER,
+    CIPHERTEXT_CHUNK_SIZE, HEADER_SIZE, HPKE_EXPORT_CONTEXT, HPKE_INFO, VERSION_HEADER,
 };
 use crate::errors::BvfError;
 use crate::io::read_exact_or_less;

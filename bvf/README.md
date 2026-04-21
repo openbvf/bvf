@@ -8,6 +8,8 @@ plaintext never touching disk, both in storage and consumption,
 were primary in design. Sensitive material is mlocked and zeroized
 on drop.
 
+Every line lovingly crafted by a human.
+
 # Two-tier API
 
 **High-level**: [`Encrypter::encrypt`] / [`Decrypter::decrypt`] — streaming

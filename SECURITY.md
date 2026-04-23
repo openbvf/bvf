@@ -2,7 +2,10 @@
 
 ## Reporting vulnerabilities
 
-Do not open a public issue. Use GitHub Security Advisories or email bvf@newvoll.net. Issues affecting key material or ciphertext integrity get priority.
+If you find a security issue, **do not open a public issue.** Instead:
+
+- **GitHub Security Advisories** (preferred): [Submit a private advisory](https://github.com/openbvf/bvf/security/advisories/new)
+- **Email**: bvf@newvoll.net
 
 ## Status
 

@@ -27,6 +27,9 @@ pub struct EncryptionState {
 impl EncryptionState {
     /// Encrypts a single plaintext chunk.
     ///
+    /// Plaintext is borrowed; the caller is responsible for zeroing
+    /// the source buffer if needed.
+    ///
     /// # Errors
     /// Returns `BvfError::EncryptionFailed` if already finalized, chunk size is wrong, or encryption fails.
     pub fn encrypt_chunk(

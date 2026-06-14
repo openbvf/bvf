@@ -21,5 +21,6 @@ Key protection uses Argon2id at libsodium SENSITIVE parameters (4 iterations, 1 
 
 - **Plaintext size**: ciphertext reveals plaintext size.
 - **Core dumps**: key material may appear in core files. The library does not call `setrlimit`, but the CLI does; calling applications should disable core dumps if required.
+- **Swap**: plaintext buffers are not mlocked and may be paged to swap under memory pressure.
 - **Timing**: no constant-time guarantees across failure modes.
 - **Key authenticity**: the library encrypts to whatever public key is provided. Verifying key ownership is the application's responsibility.

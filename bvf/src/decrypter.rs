@@ -28,6 +28,9 @@ pub struct DecryptionState {
 impl DecryptionState {
     /// Decrypts a single ciphertext chunk.
     ///
+    /// The returned plaintext is a bare `Vec<u8>`; wrap in
+    /// [`Zeroizing`](zeroize::Zeroizing) if it should be zeroed on drop.
+    ///
     /// # Errors
     /// Returns `BvfError::DecryptionFailed` if already finalized, or ciphertext is empty/too short.
     /// Returns `BvfError::AuthenticationFailed` if the chunk fails authentication.

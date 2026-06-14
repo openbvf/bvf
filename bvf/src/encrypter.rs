@@ -126,8 +126,8 @@ impl Encrypter {
         dst.write_all(&header)
             .map_err(|_| BvfError::EncryptionFailed)?;
 
-        let mut current = vec![0u8; CHUNK_SIZE];
-        let mut currlen = read_exact_or_less(src, &mut current)
+        let mut current = Zeroizing::new(vec![0u8; CHUNK_SIZE]);
+        let mut currlen = read_exact_or_less(src, &mut *current)
             .map_err(|_| BvfError::EncryptionFailed)?;
 
         if current.is_empty() {
@@ -136,9 +136,9 @@ impl Encrypter {
             return Ok(());
         }
 
-        let mut next = vec![0u8; CHUNK_SIZE];
+        let mut next = Zeroizing::new(vec![0u8; CHUNK_SIZE]);
         loop {
-            let mut nextlen = read_exact_or_less(src, &mut next)
+            let mut nextlen = read_exact_or_less(src, &mut *next)
                 .map_err(|_| BvfError::EncryptionFailed)?;
 
             let is_last = nextlen == 0;
@@ -149,7 +149,7 @@ impl Encrypter {
             if is_last {
                 break Ok(());
             }
-            swap(&mut current, &mut next);
+            swap(&mut *current, &mut *next);
             swap(&mut currlen, &mut nextlen);
         }
     }

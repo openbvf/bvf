@@ -69,7 +69,11 @@ enum Command {
     },
     /// Derive public key from private key
     Pubkey {
-        #[arg(short, long, help = "Encrypted private key file (default: $BVF_KEY_DIR/private.key.enc or ~/.bvf/private.key.enc)")]
+        #[arg(
+            short,
+            long,
+            help = "Encrypted private key file (default: $BVF_KEY_DIR/private.key.enc or ~/.bvf/private.key.enc)"
+        )]
         key: Option<PathBuf>,
     },
 }
@@ -84,13 +88,13 @@ struct FileArgs {
         help = "File containing input paths, one per line (- for stdin)"
     )]
     from: Option<PathBuf>,
+    #[arg(short, long, help = "Output path (- for stdout)")]
+    output: Option<PathBuf>,
     #[arg(
         short,
         long,
-        help = "Output path (- for stdout)"
+        help = "Key file (default: $BVF_KEY_DIR/<key> or ~/.bvf/<key>)"
     )]
-    output: Option<PathBuf>,
-    #[arg(short, long, help = "Key file (default: $BVF_KEY_DIR/<key> or ~/.bvf/<key>)")]
     key: Option<PathBuf>,
     #[arg(short, long, help = "Overwrite existing files without prompting")]
     yes: bool,
@@ -230,7 +234,8 @@ fn resolve_file_pairs(files: &FileArgs, is_encrypt: bool) -> Vec<(PathBuf, PathB
     // For encrypt: -o with multiple files is always an error (concatenated ciphertext is unusable)
     // For decrypt: -o <file> with multiple files is an error, but -o - (stdout) is allowed
     if let Some(ref o) = files.output
-        && input_files.len() > 1 && (is_encrypt || !is_stdio(o))
+        && input_files.len() > 1
+        && (is_encrypt || !is_stdio(o))
     {
         eprintln!("Error: --output cannot be used with multiple input files");
         process::exit(1);
@@ -285,7 +290,11 @@ struct Tty {
 }
 
 /// Returns true if the file should be written, false if it should be skipped.
-fn should_overwrite(path: &Path, decision: &mut OverwriteDecision, tty: &mut Tty) -> bool {
+fn should_overwrite(
+    path: &Path,
+    decision: &mut OverwriteDecision,
+    tty: &mut Tty,
+) -> bool {
     match decision {
         OverwriteDecision::YesToAll => return true,
         OverwriteDecision::NoToAll => return false,
@@ -336,12 +345,10 @@ fn open_tty() -> Tty {
             eprintln!("Error: cannot open /dev/tty for overwrite prompting: {e}");
             process::exit(1);
         });
-    let reader = io::BufReader::new(
-        fs::File::open("/dev/tty").unwrap_or_else(|e| {
-            eprintln!("Error: cannot open /dev/tty for overwrite prompting: {e}");
-            process::exit(1);
-        }),
-    );
+    let reader = io::BufReader::new(fs::File::open("/dev/tty").unwrap_or_else(|e| {
+        eprintln!("Error: cannot open /dev/tty for overwrite prompting: {e}");
+        process::exit(1);
+    }));
     Tty { reader, writer }
 }
 
@@ -364,7 +371,9 @@ fn cmd_keygen(output: &PathBuf, verbose: bool) {
 
     let from_env = std::env::var("BVF_PASSPHRASE").is_ok();
     if !from_env {
-        eprintln!("Tip: a passphrase of 3+ unrelated words works well (e.g. \"lamp tiger notebook\")");
+        eprintln!(
+            "Tip: a passphrase of 3+ unrelated words works well (e.g. \"lamp tiger notebook\")"
+        );
     }
     let passphrase = get_passphrase("Enter passphrase: ");
 
@@ -451,7 +460,8 @@ fn cmd_encrypt(files: &FileArgs, verbose: bool) {
     let mut skipped = 0;
 
     // Open /dev/tty once if any non-stdout output file already exists
-    let needs_tty = !files.yes && pairs.iter().any(|(_, dst)| !is_stdio(dst) && dst.exists());
+    let needs_tty =
+        !files.yes && pairs.iter().any(|(_, dst)| !is_stdio(dst) && dst.exists());
     let mut tty = if needs_tty { Some(open_tty()) } else { None };
     let mut overwrite = OverwriteDecision::AskEach;
 
@@ -492,7 +502,9 @@ fn encrypt_one(
     } else {
         Box::new(fs::File::create(dst).map_err(|e| e.to_string())?)
     };
-    encrypter.encrypt(&mut src_read, &mut dst_write).map_err(|e| format!("{e}"))
+    encrypter
+        .encrypt(&mut src_read, &mut dst_write)
+        .map_err(|e| format!("{e}"))
 }
 
 fn cmd_decrypt(files: &FileArgs, verbose: bool, allow_truncated: bool) {
@@ -519,7 +531,8 @@ fn cmd_decrypt(files: &FileArgs, verbose: bool, allow_truncated: bool) {
     let mut skipped = 0;
 
     // Open /dev/tty once if any non-stdout output file already exists
-    let needs_tty = !files.yes && pairs.iter().any(|(_, dst)| !is_stdio(dst) && dst.exists());
+    let needs_tty =
+        !files.yes && pairs.iter().any(|(_, dst)| !is_stdio(dst) && dst.exists());
     let mut tty = if needs_tty { Some(open_tty()) } else { None };
     let mut overwrite = OverwriteDecision::AskEach;
 
@@ -539,7 +552,11 @@ fn cmd_decrypt(files: &FileArgs, verbose: bool, allow_truncated: bool) {
             }
             Err(DecryptOneError::Bvf(BvfError::Truncated)) if allow_truncated => {
                 if verbose {
-                    eprintln!("Decrypted (truncated): {} -> {}", src.display(), dst.display());
+                    eprintln!(
+                        "Decrypted (truncated): {} -> {}",
+                        src.display(),
+                        dst.display()
+                    );
                 }
             }
             Err(e) => {
@@ -584,7 +601,9 @@ fn decrypt_one(
     } else {
         Box::new(fs::File::create(dst).map_err(|e| DecryptOneError::Io(e.to_string()))?)
     };
-    decrypter.decrypt(&mut src_read, &mut dst_write).map_err(DecryptOneError::Bvf)
+    decrypter
+        .decrypt(&mut src_read, &mut dst_write)
+        .map_err(DecryptOneError::Bvf)
 }
 
 fn cmd_pubkey(key: &PathBuf) {
@@ -636,7 +655,10 @@ fn main() {
             cmd_keygen(&output, cli.verbose);
         }
         Command::Encrypt { files } => cmd_encrypt(files, cli.verbose),
-        Command::Decrypt { files, allow_truncated } => cmd_decrypt(files, cli.verbose, *allow_truncated),
+        Command::Decrypt {
+            files,
+            allow_truncated,
+        } => cmd_decrypt(files, cli.verbose, *allow_truncated),
         Command::Pubkey { key } => {
             let key = resolve_key(key.as_ref(), false);
             cmd_pubkey(&key);

@@ -130,7 +130,7 @@ impl Encrypter {
             .map_err(|_| BvfError::EncryptionFailed)?;
 
         let mut current = Zeroizing::new(vec![0u8; CHUNK_SIZE]);
-        let mut currlen = read_exact_or_less(src, &mut *current)
+        let mut currlen = read_exact_or_less(src, &mut current)
             .map_err(|_| BvfError::EncryptionFailed)?;
 
         if current.is_empty() {
@@ -141,7 +141,7 @@ impl Encrypter {
 
         let mut next = Zeroizing::new(vec![0u8; CHUNK_SIZE]);
         loop {
-            let mut nextlen = read_exact_or_less(src, &mut *next)
+            let mut nextlen = read_exact_or_less(src, &mut next)
                 .map_err(|_| BvfError::EncryptionFailed)?;
 
             let is_last = nextlen == 0;

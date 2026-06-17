@@ -28,6 +28,9 @@ pub struct DecryptionState {
 impl DecryptionState {
     /// Decrypts a single ciphertext chunk.
     ///
+    /// The returned plaintext is a bare `Vec<u8>`; wrap in
+    /// [`Zeroizing`](zeroize::Zeroizing) if it should be zeroed on drop.
+    ///
     /// # Errors
     /// Returns `BvfError::DecryptionFailed` if already finalized, or ciphertext is empty/too short.
     /// Returns `BvfError::AuthenticationFailed` if the chunk fails authentication.
@@ -171,8 +174,9 @@ impl Decrypter {
 
             // Read contract guarantees chunklen <= buf.len(); panic correct if violated
             #[allow(clippy::indexing_slicing)]
-            let pt = state.decrypt_chunk(&chunk[..chunklen])?;
-            dst.write_all(&pt).map_err(|_| BvfError::DecryptionFailed)?;
+            let pt = Zeroizing::new(state.decrypt_chunk(&chunk[..chunklen])?);
+            dst.write_all(&pt)
+                .map_err(|_| BvfError::DecryptionFailed)?;
 
             if state.finalized {
                 let mut trailing = [0u8; 1];

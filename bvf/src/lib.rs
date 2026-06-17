@@ -3,8 +3,8 @@
 //! Built on HPKE (RFC 9180) + XChaCha20-Poly1305 secretstream +
 //! Argon2id. Minimization of crypto surface and amenability to
 //! plaintext never touching disk, both in storage and consumption,
-//! were primary in design. Sensitive material is mlocked and zeroized
-//! on drop.
+//! were primary in design. Sensitive material is zeroized on drop;
+//! keys and passphrases are additionally mlocked.
 //!
 //! # Two-tier API
 //!

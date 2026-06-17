@@ -27,6 +27,9 @@ pub struct EncryptionState {
 impl EncryptionState {
     /// Encrypts a single plaintext chunk.
     ///
+    /// Plaintext is borrowed; the caller is responsible for zeroing
+    /// the source buffer if needed.
+    ///
     /// # Errors
     /// Returns `BvfError::EncryptionFailed` if already finalized, chunk size is wrong, or encryption fails.
     pub fn encrypt_chunk(
@@ -126,7 +129,7 @@ impl Encrypter {
         dst.write_all(&header)
             .map_err(|_| BvfError::EncryptionFailed)?;
 
-        let mut current = vec![0u8; CHUNK_SIZE];
+        let mut current = Zeroizing::new(vec![0u8; CHUNK_SIZE]);
         let mut currlen = read_exact_or_less(src, &mut current)
             .map_err(|_| BvfError::EncryptionFailed)?;
 
@@ -136,7 +139,7 @@ impl Encrypter {
             return Ok(());
         }
 
-        let mut next = vec![0u8; CHUNK_SIZE];
+        let mut next = Zeroizing::new(vec![0u8; CHUNK_SIZE]);
         loop {
             let mut nextlen = read_exact_or_less(src, &mut next)
                 .map_err(|_| BvfError::EncryptionFailed)?;
@@ -149,7 +152,7 @@ impl Encrypter {
             if is_last {
                 break Ok(());
             }
-            swap(&mut current, &mut next);
+            swap(&mut *current, &mut *next);
             swap(&mut currlen, &mut nextlen);
         }
     }

@@ -7,3 +7,21 @@ repos:
     - id: check-yaml
       args: ['--unsafe']
     - id: check-added-large-files
+
+- repo: local
+  hooks:
+    - id: cargo-fmt
+      name: cargo fmt
+      entry: cargo fmt --all
+      language: system
+      types: [rust]
+      pass_filenames: false
+      stages: [pre-commit]
+
+    - id: cargo-clippy
+      name: cargo clippy
+      entry: cargo clippy --workspace -- -D warnings
+      language: system
+      types: [rust]
+      pass_filenames: false
+      stages: [pre-push]
